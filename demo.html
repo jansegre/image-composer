@@ -6,17 +6,17 @@
 <style>
 .base {
     background-image: url("whizzkid.png");
-    background-size: 800px 600px;
+    background-size: 1600px 1200px;
     background-repeat: no-repeat;
-    width: 800px;
-    height: 600px;
+    width: 1600px;
+    height: 1200px;
 }
 .box {
     background-image: url("matrix.png");
-    background-size: 640px 512px;
+    background-size: 1280px 1024px;
     background-repeat: no-repeat;
-    width: 640px;
-    height: 512px;
+    width: 1280px;
+    height: 1024px;
     border: 1px solid white;
     color: white;
 }
@@ -60,6 +60,7 @@ getTransform = (from, to) ->
   H
 
 applyTransform = (element, originalPos, targetPos, callback) ->
+  console.log targetPos
   # All offsets were calculated relative to the document
   # Make them relative to (0, 0) of the element instead
   from = for p in originalPos

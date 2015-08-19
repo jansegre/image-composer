@@ -5,37 +5,17 @@ import numpy as np
 from PIL import Image
 
 
-class Camera(object):
-
-    def __init__(self, c, t, e):
-        self.c = np.array(c)
-        self.e = np.array(e)
-        m1 = np.matrix([
-            [            1,              0,              0],
-            [            0,  np.cos(-t[0]), -np.sin(-t[0])],
-            [            0,  np.sin(-t[0]),  np.cos(-t[0])],
-        ])
-        m2 = np.matrix([
-            [ np.cos(-t[1]),             0,  np.sin(-t[1])],
-            [             0,             1,              0],
-            [-np.sin(-t[1]),             0,  np.cos(-t[1])],
-        ])
-        m3 = np.matrix([
-            [ np.cos(-t[1]), -np.sin(-t[1]),             0],
-            [ np.sin(-t[1]),  np.cos(-t[1]),             0],
-            [             0,              0,             1],
-        ])
-        self.m = m1 * m2 * m3
-
-    def project(self, a):
-        a = np.array(a)
-        d = self.m.dot(a - self.c)
-        d = np.asarray(d).reshape(-1)
-        e = self.e
-        ed = e[2] / d[2]
-        bx = ed * d[0] - e[0]
-        by = ed * d[1] - e[1]
-        return np.array([bx, by])
+def matrix3d(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4):
+    return np.matrix([
+        [a1, a2, a3, a4],
+        [b1, b2, b3, b4],
+        [c1, c2, c3, c4],
+        [d1, d2, d3, d4],
+        #[a1, b1, c1, d1],
+        #[a2, b2, c2, d2],
+        #[a3, b3, c3, d3],
+        #[a4, b4, c4, d4],
+    ])
 
 
 def main(argv):
@@ -50,22 +30,14 @@ def main(argv):
 
     im = Image.open(args.image)
     pix = im.load()
-
-    cam = Camera([4000, 1000, 5000], [0.3, 0, 0], [5000, 1000, 6000])
-
-    f = 2.0
-    m = np.matrix([
-        [1, 0, 0,   0],
-        [0, 1, 0,   0],
-        [0, 0, 1/f, 0],
-    ])
+    m = matrix3d(0.311894, -0.0183492, 0, 0.000312516, 0.336065, 0.373659, 0, 0.0000710468, 0, 0, 1, 0, 138, 623, 0, 1)
 
     for i in range(im.width):
         for j in range(im.height):
-            a = np.array([i, j, 0.])
-            b = cam.project(a)
-            x = int(b[0])
-            y = int(b[1])
+            a = np.array([i, j, 1.0, 1.0])
+            b = np.asarray(m.dot(a)).reshape(-1)
+            x = int(b[0]/b[3])
+            y = int(b[1]/b[3])
             if 0 <= x < base_im.width and 0 <= y < base_im.height:
                 base_pix[x, y] = pix[i, j]
 
